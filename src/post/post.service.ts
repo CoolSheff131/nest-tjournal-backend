@@ -1,19 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from './entities/user.entity';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { PostEntity } from './entities/post.entity';
 
 @Injectable()
-export class UserService {
-  constructor(
-    @InjectRepository(UserEntity)
-    private repository: Repository<UserEntity>
-  ){}
+export class PostService {
+  constructor(@InjectRepository(PostEntity) private repository: Repository<PostEntity>){}
 
-  create(createUserDto: CreateUserDto) {
-    return this.repository.save(createUserDto);
+  create(createPostDto: CreatePostDto) {
+    return this.repository.save(createPostDto);
   }
 
   findAll() {
@@ -28,12 +25,12 @@ export class UserService {
     return find;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updatePostDto: UpdatePostDto) {
     const find = await this.repository.findOne(+id);
     if(!find){
       throw new NotFoundException('Статья не найдена')
     }
-    return this.repository.update(id,updateUserDto);
+    return this.repository.update(id,updatePostDto);
   }
 
   async remove(id: number) {
