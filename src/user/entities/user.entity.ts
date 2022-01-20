@@ -16,5 +16,8 @@ export class UserEntity {
     @Column({nullable: true})
     password?: string;
 
-
+    @CreateDateColumn({type: 'timestamp'})
+    createdAt: Date;
+    @UpdateDateColumn({type: 'timestamp'})
+    updatedAt: Date;
 }
