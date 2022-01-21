@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 
@@ -20,8 +21,15 @@ export class UserService {
     return this.repository.find();
   }
 
-  async findOne(id: number) {
+  async findById(id: number) {
     const find = await this.repository.findOne(+id);
+    if(!find){
+      throw new NotFoundException('Статья не найдена')
+    }
+    return find;
+  }
+  async findByCond(cond: LoginUserDto) {
+    const find = await this.repository.findOne(cond);
     if(!find){
       throw new NotFoundException('Статья не найдена')
     }
