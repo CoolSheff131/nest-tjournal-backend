@@ -14,7 +14,23 @@ export class PostService {
   }
 
   findAll() {
-    return this.repository.find();
+    return this.repository.find({
+      order: {
+        createdAt: 'DESC'
+      }
+    });
+  }
+  async popular() {
+    const qp = this.repository.createQueryBuilder('p')
+    qp.orderBy('views','DESC')
+    qp.limit(10)
+
+    const [items, total] = await qp.getManyAndCount()
+
+    return{
+      items,
+      total,
+    }
   }
 
   async findOne(id: number) {
