@@ -66,6 +66,13 @@ export class PostService {
     if(!find){
       throw new NotFoundException('Статья не найдена')
     }
+    await this.repository.createQueryBuilder('posts')
+    .whereInIds(id)
+    .update()
+    .set({
+      views: () => 'views + 1'
+    })
+    .execute()
     return find;
   }
 
