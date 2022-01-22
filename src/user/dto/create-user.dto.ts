@@ -4,7 +4,7 @@ import { UserEntity } from '../entities/user.entity';
 
 export class CreateUserDto {
     @Length(3,32, {message:'Минимум 3'})
-    fullname:string;
+    fullName:string;
 
     @IsEmail(undefined, {message: 'Неверная почта'})
     @UniqueOnDatabase(UserEntity,{message: 'Такая почта уже занята'})
