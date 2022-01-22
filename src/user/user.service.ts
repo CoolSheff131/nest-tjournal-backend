@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { SearchUserDto } from './dto/search-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 
@@ -50,5 +51,25 @@ export class UserService {
       throw new NotFoundException('Статья не найдена')
     }
     return this.repository.delete(id);
+  }
+
+
+  async search(dto: SearchUserDto) {
+    const qb = this.repository.createQueryBuilder('u')
+    qb.limit(dto.limit || 0)
+    qb.take(dto.take || 10)
+    
+    if(dto.fullname){
+      qb.andWhere(`u.fullname ILIKE :fullname`)
+    }
+    if(dto.email){
+      qb.andWhere(`u.email ILIKE :email`)
+    }
+    qb.setParameters({
+      email: `%${dto.email}%`,
+      fullname: `%${dto.fullname}%`,
+    })
+    const [items, total] = await qb.getManyAndCount()
+    return {items,total}
   }
 }
