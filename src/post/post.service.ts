@@ -11,7 +11,29 @@ export class PostService {
   constructor(@InjectRepository(PostEntity) private repository: Repository<PostEntity>){}
 
   create(createPostDto: CreatePostDto) {
-    return this.repository.save(createPostDto);
+    const firstParagraph = createPostDto.body.find(obj => obj.type === 'paragraph')?.data?.text
+    return this.repository.save({
+      title: createPostDto.title,
+      body: createPostDto.body,
+      tags: createPostDto.tags,
+      description: firstParagraph || ''
+    });
+  }
+
+
+  async update(id: number, updatePostDto: UpdatePostDto) {
+    const find = await this.repository.findOne(+id);
+    if(!find){
+      throw new NotFoundException('Статья не найдена')
+    }
+
+    const firstParagraph = updatePostDto.body.find(obj => obj.type === 'paragraph')?.data?.text
+    return this.repository.update(id,{
+      title: updatePostDto.title,
+      body: updatePostDto.body,
+      tags: updatePostDto.tags,
+      description: firstParagraph||'',
+    });
   }
 
   findAll() {
@@ -76,13 +98,7 @@ export class PostService {
     return find;
   }
 
-  async update(id: number, updatePostDto: UpdatePostDto) {
-    const find = await this.repository.findOne(+id);
-    if(!find){
-      throw new NotFoundException('Статья не найдена')
-    }
-    return this.repository.update(id,updatePostDto);
-  }
+  
 
   async remove(id: number) {
     const find = await this.repository.findOne(+id);

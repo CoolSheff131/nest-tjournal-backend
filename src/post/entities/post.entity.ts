@@ -10,8 +10,11 @@ export class PostEntity {
     @Column()
     title: string;
 
+    @Column({type: 'jsonb'})
+    body: any[];
+
     @Column()
-    body: string;
+    description: string
 
     @Column({default: 0})
     views?: number;
