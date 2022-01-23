@@ -1,3 +1,4 @@
+import { CommentEntity } from 'src/comment/entities/comment.entity';
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 
 
@@ -15,6 +16,12 @@ export class UserEntity {
 
     @Column({nullable: true})
     password?: string;
+
+    @OneToMany(()=>CommentEntity,(comment)=>comment.user,{
+        eager: false,
+        nullable: true,
+    })
+    comments: CommentEntity[];
 
     @CreateDateColumn({type: 'timestamp'})
     createdAt: Date;
