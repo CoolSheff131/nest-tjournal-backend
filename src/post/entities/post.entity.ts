@@ -1,3 +1,4 @@
+import { UserEntity } from 'src/user/entities/user.entity';
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 
 
@@ -14,7 +15,10 @@ export class PostEntity {
     body: any[];
 
     @Column()
-    description: string
+    description: string;
+
+    @ManyToOne(()=>UserEntity, {eager: true})
+    user: UserEntity;
 
     @Column({default: 0})
     views?: number;

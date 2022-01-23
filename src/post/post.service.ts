@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunnerProviderAlreadyReleasedError, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -10,18 +10,19 @@ import { PostEntity } from './entities/post.entity';
 export class PostService {
   constructor(@InjectRepository(PostEntity) private repository: Repository<PostEntity>){}
 
-  create(createPostDto: CreatePostDto) {
+  create(createPostDto: CreatePostDto, userId: number) {
     const firstParagraph = createPostDto.body.find(obj => obj.type === 'paragraph')?.data?.text
     return this.repository.save({
       title: createPostDto.title,
       body: createPostDto.body,
       tags: createPostDto.tags,
+      user: {id: userId},
       description: firstParagraph || ''
     });
   }
 
 
-  async update(id: number, updatePostDto: UpdatePostDto) {
+  async update(id: number, updatePostDto: UpdatePostDto,userId: number,) {
     const find = await this.repository.findOne(+id);
     if(!find){
       throw new NotFoundException('Статья не найдена')
@@ -31,6 +32,7 @@ export class PostService {
     return this.repository.update(id,{
       title: updatePostDto.title,
       body: updatePostDto.body,
+      user: {id: userId},
       tags: updatePostDto.tags,
       description: firstParagraph||'',
     });
@@ -58,6 +60,7 @@ export class PostService {
 
   async search(dto: SearchPostDto) {
     const qb = this.repository.createQueryBuilder('p')
+    qb.leftJoinAndSelect('p.user', 'user')
     qb.limit(dto.limit || 0)
     qb.take(dto.take || 10)
     if(dto.views){
@@ -100,10 +103,13 @@ export class PostService {
 
   
 
-  async remove(id: number) {
+  async remove(id: number,userId: number) {
     const find = await this.repository.findOne(+id);
     if(!find){
       throw new NotFoundException('Статья не найдена')
+    }
+    if(find.user.id !== userId){
+      throw new ForbiddenException('Нет доступа к этой статье')
     }
     return this.repository.delete(id);
   }
