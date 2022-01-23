@@ -1,4 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from 'src/decorators/user.decorator';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -8,8 +10,9 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
+  @UseGuards(JwtAuthGuard)
+  create(@Body() createCommentDto: CreateCommentDto, @User() userId: number) {
+    return this.commentService.create(createCommentDto,userId);
   }
 
   @Get()
